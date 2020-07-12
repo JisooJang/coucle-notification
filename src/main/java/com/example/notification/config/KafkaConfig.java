@@ -60,7 +60,10 @@ public class KafkaConfig {
     @Bean
     public ConsumerFactory<String, AlarmTalk> consumerFactory() {
         JsonDeserializer<AlarmTalk> deserializer = new JsonDeserializer<>(AlarmTalk.class);
-        deserializer.addTrustedPackages("com.example.mycoupon.template.AlarmTalk");
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+
         return new DefaultKafkaConsumerFactory<>(
                 kafkaProperties.buildConsumerProperties(),
                 new StringDeserializer(),
