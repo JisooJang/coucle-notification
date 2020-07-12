@@ -14,7 +14,6 @@ public class AlarmTalkListener {
             groupId = "alarmtalk-group-id"
     )
     public void handle(AlarmTalk alarmTalk) {
-        log.debug("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getMediaId() + " : " + alarmTalk.getPhoneNumber());
-        System.out.println("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getMediaId() + " : " + alarmTalk.getPhoneNumber());
+        log.info("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getMediaId() + " : " + alarmTalk.getPhoneNumber());
     }
 }
