@@ -1,5 +1,7 @@
 # coucle-notification
-event consumer app handling notification action(emailSender, SmsSender...) using Apache Kafka.
+- event consumer app handling notification action(emailSender, SmsSender...) using Apache Kafka.
+- notification service managed by `spring-cloud-eureka`
+- using `spring-cloud-openfeign` for rest client.
 
 ## 제공 기능 (Kafka Consumer)
 - 문자 메시지 전송
