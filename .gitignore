@@ -32,3 +32,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+## properties ##
+resources/api-keys.properties
