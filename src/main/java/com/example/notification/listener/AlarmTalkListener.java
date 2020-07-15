@@ -35,7 +35,7 @@ public class AlarmTalkListener {
     public void handle(AlarmTalk alarmTalk) {
         log.info("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getMediaId() + " : " + alarmTalk.getPhoneNumber());
         SendSMSRequest request = SendSMSRequest.builder()
-                .body("문자 전송 test")
+                .body("문자 전송 test : " + alarmTalk.getMediaId())
                 .sendNo(sendNo)
                 .build();
         request.addRecipientInfo(alarmTalk.getPhoneNumber(), CountryCode.SOUTH_KOREA);
