@@ -1,10 +1,10 @@
 package com.example.notification.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -36,22 +36,25 @@ public class SendSMSResponse {
    }
 }
      */
-    private Header header;
-    private Body body;
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    private static class Header {
-        private boolean isSuccessful;
-        private int resultCode;
-        private String resultMessage;
+    private Boolean isSuccessful;
+    private Integer resultCode; // 실패 코드. 성공시 0
+    private String resultMessage; // 실패 메시지. 성공시 "SUCCESS"
+
+    private String requestId; // 요청 코드
+    private String statusCode; // 요청 상태 코드(1:요청 중, 2:요청 완료, 3:요청 실패)
+
+    @JsonProperty("header")
+    public void unpackNestedHeader(Map<String, Object> header) {
+        this.isSuccessful = (Boolean) header.get("isSuccessful");
+        this.resultCode = (Integer) header.get("resultCode");
+        this.resultMessage = (String) header.get("resultMessage");
     }
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    private static class Body {
-        private Map<String, ?> properties = new HashMap<>();
+    @JsonProperty("body")
+    private void unpackNestedBody(Map<String, Object> body) {
+        Map<String,String> bodyData = (Map<String,String>) body.get("data");
+        this.requestId = bodyData.get("requestId");
+        this.statusCode = bodyData.get("statusCode");
     }
 }
