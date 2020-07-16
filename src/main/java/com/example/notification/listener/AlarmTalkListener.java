@@ -41,7 +41,7 @@ public class AlarmTalkListener {
         request.addRecipientInfo(alarmTalk.getPhoneNumber(), alarmTalk.getCountryCode());
 
         SendSMSResponse response = smsClient.sendSMS(appKey, request);
-        System.out.println(response);
+        log.info(response.toString());
 
     }
 }

@@ -57,4 +57,11 @@ public class SendSMSResponse {
         this.requestId = bodyData.get("requestId");
         this.statusCode = bodyData.get("statusCode");
     }
+
+    // TODO : Listener에서 체크한후, rest 서버 복구 가능 에러면 error-handler(retry)처리. (기본 10회 재시도 후, 실패 레코드 로그 처리)
+    // TODO: 클라이언트 관련 에러면 retry X. dead-letter-topic에 로그 목적으로 실패 메시지 남기고 return. (메시지 처리-완료 처리)
+    private boolean checkResponseHandling() {
+        // https://docs.toast.com/ko/Notification/SMS/ko/error-code/
+        return this.resultCode == 0;
+    }
 }
