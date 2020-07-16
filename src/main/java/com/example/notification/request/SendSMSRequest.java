@@ -41,9 +41,10 @@ public class SendSMSRequest {
     private String sendNo; // 발신번호. 필수
     private String requestDate; // 예약일시
     private String senderGroupingKey; // 발신자 그룹 키
-    private List<RecipientInfo> recipientList = new ArrayList<>(); // 수신번호 정보. 필수
+    private List<RecipientInfo> recipientList; // 수신번호 정보. 필수
 
     public void addRecipientInfo(String recipientNo, String countryCode) {
+        this.recipientList = new ArrayList<>();
         this.recipientList.add(new RecipientInfo(recipientNo, countryCode));
     }
 
