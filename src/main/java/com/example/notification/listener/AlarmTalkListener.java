@@ -33,12 +33,12 @@ public class AlarmTalkListener {
             groupId = "alarmtalk-group-id"
     )
     public void handle(AlarmTalk alarmTalk) {
-        log.info("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getMediaId() + " : " + alarmTalk.getPhoneNumber());
+        log.info("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getPhoneNumber() + " : " + alarmTalk.getMessage());
         SendSMSRequest request = SendSMSRequest.builder()
-                .body("문자 전송 test : " + alarmTalk.getMediaId())
+                .body(alarmTalk.getMessage())
                 .sendNo(sendNo)
                 .build();
-        request.addRecipientInfo(alarmTalk.getPhoneNumber(), CountryCode.SOUTH_KOREA);
+        request.addRecipientInfo(alarmTalk.getPhoneNumber(), alarmTalk.getCountryCode());
 
         SendSMSResponse response = smsClient.sendSMS(appKey, request);
         System.out.println(response);
