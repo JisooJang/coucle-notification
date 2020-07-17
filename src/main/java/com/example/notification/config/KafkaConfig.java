@@ -1,10 +1,11 @@
 package com.example.notification.config;
 
 import com.example.notification.template.AlarmTalk;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +16,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
+@Slf4j
 @Profile("local")
 @Configuration
 public class KafkaConfig {
@@ -79,17 +82,20 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, AlarmTalk> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setErrorHandler(errorHandler());
         return factory;
     }
 
     @Bean
-    public KafkaTemplate<String, AlarmTalk> kafkaTemplate() {
+    public KafkaOperations<String, AlarmTalk> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
     @Bean
-    public SeekToCurrentErrorHandler errorHandler(BiConsumer<ConsumerRecord<?, ?>, Exception> recoverer) {
-        SeekToCurrentErrorHandler handler = new SeekToCurrentErrorHandler(recoverer);
+    public SeekToCurrentErrorHandler errorHandler() {
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate(),
+                (record, exception) -> new TopicPartition(record.topic() + ".failures", record.partition()));
+        SeekToCurrentErrorHandler handler = new SeekToCurrentErrorHandler(recoverer, new FixedBackOff(0, 3));
         handler.addNotRetryableException(IllegalArgumentException.class);
         return handler;
     }
