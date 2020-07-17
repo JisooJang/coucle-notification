@@ -94,7 +94,9 @@ public class KafkaConfig {
     @Bean
     public SeekToCurrentErrorHandler errorHandler() {
         DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate(),
-                (record, exception) -> new TopicPartition(record.topic() + ".failures", record.partition()));
+                (record, exception) -> {
+                    return new TopicPartition(record.topic() + ".failures", record.partition());
+                });
         SeekToCurrentErrorHandler handler = new SeekToCurrentErrorHandler(recoverer, new FixedBackOff(5000, 5));
         handler.addNotRetryableException(IllegalArgumentException.class);
         return handler;

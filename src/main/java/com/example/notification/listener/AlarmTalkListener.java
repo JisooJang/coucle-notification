@@ -10,6 +10,7 @@ import com.example.notification.response.SendSMSResponse;
 import com.example.notification.template.AlarmTalk;
 import com.example.notification.template.EmailSend;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -49,9 +50,21 @@ public class AlarmTalkListener {
         response.checkRetryByResponseCode(); // check error handling.
 
         // FIXME : testinf for retry...
-        //throw new ShouldRetryException("retry me!!");
+        // throw new ShouldRetryException("retry me!!");
 
     }
+
+    // DLQ topic handler
+    @KafkaListener(topics = "alarmtalk.notification.failures",
+            containerFactory = "alarmTalkKafkaListenerContainerFactory",
+            groupId = "alarmtalk-fail-group")
+    public void handle(ConsumerRecord<Object, AlarmTalk> record) {
+        log.info("alarmTalkListener : alarmtalk.notification.failures event received.");
+        log.info("headers : " + record.headers().toString());
+        log.info("timestamp : " + record.timestamp());
+        log.info("payload : " + record.value());
+    }
+
 
     @KafkaListener(topics = "email.notification",
             containerFactory = "alarmTalkKafkaListenerContainerFactory",
@@ -62,4 +75,5 @@ public class AlarmTalkListener {
         SendEmailResponse response = emailClient.sendEmail(appKey, request);
         log.info(response.toString());
     }
+
 }
