@@ -20,6 +20,6 @@
 
 
 ## Kafka 에러 핸들링 및 Retry 정책
-- rest 통신 응답 결과가 클라이언트 측의 에러 코드가 아니면 기본 5초 간격으로 retry 5회 실행 후, <br>
-이후에도 에러 코드가 지속되는 경우 dead-letter-topic으로 전달. (`{기존 레코드 토픽명}.failure`)
+- rest 통신 응답 결과가 클라이언트 측의 에러 코드인 경우를 제외하고, 기본 5초 간격으로 retry 5회 실행 후, <br>
+이후에도 에러가 발생하거나 rest 에러 코드가 지속되는 경우 dead-letter-topic으로 전달. (`{기존 레코드 토픽명}.failure`)
 - NHN TOAST API 에러 코드 참고 : https://docs.toast.com/ko/Notification/SMS/ko/error-code/
