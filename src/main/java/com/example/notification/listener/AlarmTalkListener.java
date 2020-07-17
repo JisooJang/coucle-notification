@@ -1,11 +1,14 @@
 package com.example.notification.listener;
 
+import com.example.notification.client.EmailClient;
 import com.example.notification.client.SMSClient;
-import com.example.notification.choices.CountryCode;
 import com.example.notification.exception.ShouldRetryException;
+import com.example.notification.request.SendEmailRequest;
 import com.example.notification.request.SendSMSRequest;
+import com.example.notification.response.SendEmailResponse;
 import com.example.notification.response.SendSMSResponse;
 import com.example.notification.template.AlarmTalk;
+import com.example.notification.template.EmailSend;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,12 +21,15 @@ import org.springframework.stereotype.Component;
 @PropertySource("classpath:api-keys.properties")
 public class AlarmTalkListener {
     private final SMSClient smsClient;
+    private final EmailClient emailClient;
+
     @Value("${toast.sms.app_key}")
     private String appKey;
 
     @Autowired
-    public AlarmTalkListener(SMSClient smsClient) {
+    public AlarmTalkListener(SMSClient smsClient, EmailClient emailClient) {
         this.smsClient = smsClient;
+        this.emailClient = emailClient;
     }
 
     @KafkaListener(topics = "alarmtalk.notification",
@@ -42,5 +48,18 @@ public class AlarmTalkListener {
         log.info(response.toString());
         response.checkRetryByResponseCode(); // check error handling.
 
+        // FIXME : testinf for retry...
+        //throw new ShouldRetryException("retry me!!");
+
+    }
+
+    @KafkaListener(topics = "email.notification",
+            containerFactory = "alarmTalkKafkaListenerContainerFactory",
+            groupId = "email-group-id")
+    public void handle(EmailSend emailSend) {
+        log.info("alarmTalkListener : emailSend.notification event received. : ");
+        SendEmailRequest request = SendEmailRequest.builder().build();
+        SendEmailResponse response = emailClient.sendEmail(appKey, request);
+        log.info(response.toString());
     }
 }
