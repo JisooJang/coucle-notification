@@ -42,6 +42,7 @@ public class AlarmTalkListener {
 
         SendSMSResponse response = smsClient.sendSMS(appKey, request);
         log.info(response.toString());
+        response.checkRetryByResponseCode(); // check error handling.
 
     }
 }
