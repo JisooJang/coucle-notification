@@ -10,6 +10,7 @@
         - countryCode (String - required) : 메시지 내용에 담기는 유저 아이디. ex) "82"
         - phoneNumber (String - required) : 메시지 수신 번호.
         - message (String - required) : 메시지 전송 내용. 최대 90바이트(한글 45자, 영문 90자)
+    - producer 참고 : https://github.com/JisooJang/coucle-user/blob/master/src/main/java/com/example/user/service/NotiService.java
     - NHN TOAST API 사용 (spring-cloud-feignClient를 통해 rest-client 구현)
     - https://docs.toast.com/ko/Notification/SMS/ko/api-guide/
 - **이메일 전송**
@@ -20,6 +21,7 @@
         - title (String - required) : 전송할 메일 제목(최대 998자)
         - body (String - required) : 전송할 메일 내용
         - receiveMailAddr (String - required) : 수신자 이메일 주소. 
+    - producer 참고 : https://github.com/JisooJang/coucle-coupon/blob/master/src/main/java/com/example/mycoupon/service/NotiService.java
     - NHN TOAST API 사용 (spring-cloud-feignClient를 통해 rest-client 구현)
     - https://docs.toast.com/ko/Notification/Email/ko/api-guide/
 
