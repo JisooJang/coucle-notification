@@ -44,7 +44,9 @@ public class SendSMSRequest {
     private List<RecipientInfo> recipientList; // 수신번호 정보. 필수
 
     public void addRecipientInfo(String recipientNo, String countryCode) {
-        this.recipientList = new ArrayList<>();
+        if(recipientList == null) {
+            recipientList = new ArrayList<>();
+        }
         this.recipientList.add(new RecipientInfo(recipientNo, countryCode));
     }
 
@@ -53,7 +55,6 @@ public class SendSMSRequest {
     private static class RecipientInfo {
         private String recipientNo; // 수신번호. 필수
         private String countryCode; // 국가번호
-
     }
 
 }
