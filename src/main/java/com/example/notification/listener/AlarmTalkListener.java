@@ -37,7 +37,7 @@ public class AlarmTalkListener {
             containerFactory = "alarmTalkKafkaListenerContainerFactory",
             groupId = "alarmtalk-group-id"
     )
-    public void handle(AlarmTalk alarmTalk) {
+    public void handleSMSEvent(AlarmTalk alarmTalk) {
         log.info("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getPhoneNumber() + " : " + alarmTalk.getMessage());
         SendSMSRequest request = SendSMSRequest.builder()
                 .body(alarmTalk.getMessage())
@@ -49,7 +49,7 @@ public class AlarmTalkListener {
         log.info(response.toString());
         response.checkRetryByResponseCode(); // check error handling.
 
-        // FIXME : testinf for retry...
+        // FIXME : testing for retry...
         // throw new ShouldRetryException("retry me!!");
 
     }
@@ -57,8 +57,8 @@ public class AlarmTalkListener {
     // DLQ topic handler
     @KafkaListener(topics = "alarmtalk.notification.failures",
             containerFactory = "alarmTalkKafkaListenerContainerFactory",
-            groupId = "alarmtalk-fail-group")
-    public void handle(ConsumerRecord<Object, AlarmTalk> record) {
+            groupId = "alarmtalk-failed-group")
+    public void handleSMSFailure(ConsumerRecord<Object, AlarmTalk> record) {
         log.info("alarmTalkListener : alarmtalk.notification.failures event received.");
         log.info("headers : " + record.headers().toString());
         log.info("timestamp : " + record.timestamp());
@@ -69,7 +69,17 @@ public class AlarmTalkListener {
     @KafkaListener(topics = "email.notification",
             containerFactory = "alarmTalkKafkaListenerContainerFactory",
             groupId = "email-group-id")
-    public void handle(EmailSend emailSend) {
+    public void handleEmailEvent(EmailSend emailSend) {
+        log.info("alarmTalkListener : emailSend.notification event received. : ");
+        SendEmailRequest request = SendEmailRequest.builder().build();
+        SendEmailResponse response = emailClient.sendEmail(appKey, request);
+        log.info(response.toString());
+    }
+
+    @KafkaListener(topics = "email.notification.failures",
+            containerFactory = "alarmTalkKafkaListenerContainerFactory",
+            groupId = "email-failed-group")
+    public void handleEmailFailure(ConsumerRecord<Object, AlarmTalk> record) {
         log.info("alarmTalkListener : emailSend.notification event received. : ");
         SendEmailRequest request = SendEmailRequest.builder().build();
         SendEmailResponse response = emailClient.sendEmail(appKey, request);
