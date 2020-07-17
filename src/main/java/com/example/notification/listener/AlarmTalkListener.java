@@ -2,6 +2,7 @@ package com.example.notification.listener;
 
 import com.example.notification.client.SMSClient;
 import com.example.notification.choices.CountryCode;
+import com.example.notification.exception.ShouldRetryException;
 import com.example.notification.request.SendSMSRequest;
 import com.example.notification.response.SendSMSResponse;
 import com.example.notification.template.AlarmTalk;
@@ -20,9 +21,6 @@ public class AlarmTalkListener {
     @Value("${toast.sms.app_key}")
     private String appKey;
 
-    @Value("${toast.sms.sendNo}")
-    private String sendNo;
-
     @Autowired
     public AlarmTalkListener(SMSClient smsClient) {
         this.smsClient = smsClient;
@@ -36,7 +34,7 @@ public class AlarmTalkListener {
         log.info("alarmTalkListener : alarmtalk.notification event received. : " + alarmTalk.getPhoneNumber() + " : " + alarmTalk.getMessage());
         SendSMSRequest request = SendSMSRequest.builder()
                 .body(alarmTalk.getMessage())
-                .sendNo(sendNo)
+                .sendNo(alarmTalk.getPhoneNumber())
                 .build();
         request.addRecipientInfo(alarmTalk.getPhoneNumber(), alarmTalk.getCountryCode());
 
