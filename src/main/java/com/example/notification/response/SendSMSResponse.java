@@ -1,5 +1,6 @@
 package com.example.notification.response;
 
+import com.example.notification.exception.ShouldRetryException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,7 +53,7 @@ public class SendSMSResponse {
     }
 
     @JsonProperty("body")
-    private void unpackNestedBody(Map<String, Object> body) {
+    public void unpackNestedBody(Map<String, Object> body) {
         Map<String,String> bodyData = (Map<String,String>) body.get("data");
         this.requestId = bodyData.get("requestId");
         this.statusCode = bodyData.get("statusCode");
@@ -60,8 +61,13 @@ public class SendSMSResponse {
 
     // TODO : Listener에서 체크한후, rest 서버 복구 가능 에러면 error-handler(retry)처리. (기본 10회 재시도 후, 실패 레코드 로그 처리)
     // TODO: 클라이언트 관련 에러면 retry X. dead-letter-topic에 로그 목적으로 실패 메시지 남기고 return. (메시지 처리-완료 처리)
-    private boolean checkResponseHandling() {
+    public void checkRetryByResponseCode() {
         // https://docs.toast.com/ko/Notification/SMS/ko/error-code/
-        return this.resultCode == 0;
+        if(this.resultCode == null) return;
+        if(this.resultCode == -9999 || this.resultCode == -2021) {
+            throw new ShouldRetryException(this.resultMessage);
+        } else {
+            throw new IllegalArgumentException(this.resultMessage);
+        }
     }
 }
