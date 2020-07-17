@@ -1,7 +1,7 @@
 # coucle-notification
 - event consumer app handling notification action(emailSender, SmsSender...) using Apache Kafka.
 - notification service managed by `spring-cloud-eureka`
-- using `spring-cloud-openfeign` for rest client.
+- using `spring-cloud-openfeign` for REST client.
 
 ## 제공 기능 (Kafka Consumer)
 - **문자 메시지 전송**
@@ -24,7 +24,7 @@
     - https://docs.toast.com/ko/Notification/Email/ko/api-guide/
 
 
-### Kafka Error handling
+## Kafka Error handling
 - rest 통신 응답 결과가 클라이언트 측의 에러 코드인 경우를 제외하고, 기본 5초 간격으로 retry 5회 실행 후, <br>
 이후에도 에러가 발생하거나 rest 에러 코드가 지속되는 경우 `dead-letter-topic`으로 전달. (`{기존 레코드 토픽명}.failure`)
 - 각 dead-letter-topic도 `KafkaListener`를 통해 consume하고 있으며, 구체적인 레코드 헤더, 시간, 내용 등 로그 처리. 
