@@ -82,6 +82,7 @@ public class AlarmTalkListener {
                 .build();
         request.addReceiverList(emailSend.getReceiveMailAddr(), emailSend.getReceiveType());
 
+        // FIXME : DTO parsing error...
         SendEmailResponse response = emailClient.sendEmail(EmailAppKey, request);
         log.info(response.toString());
     }
@@ -90,7 +91,10 @@ public class AlarmTalkListener {
             containerFactory = "sendEmailKafkaListenerContainerFactory",
             groupId = "email-failed-group")
     public void handleEmailFailure(ConsumerRecord<Object, AlarmTalk> record) {
-        log.info("alarmTalkListener : emailSend.notification failures event received. : ");
+        log.info("alarmTalkListener : emailSend.notification failures event received!!!");
+        log.info("headers : " + record.headers().toString());
+        log.info("timestamp : " + record.timestamp());
+        log.info("payload : " + record.value());
     }
 
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -30,10 +31,17 @@ public class SendEmailResponse {
 
     @JsonProperty("body")
     public void unpackNestedBody(Map<String, Object> body) {
-        Map<String,String> bodyData = (Map<String,String>) body.get("data");
-        this.requestId = bodyData.get("requestId");
-        this.receiverResultCode = Integer.parseInt(bodyData.get("resultCode"));
-        this.receiverResultMessage = bodyData.get("resultMessage");
+        Map<String,Object> bodyData = (Map<String,Object>) body.get("data");
+        this.requestId = (String) bodyData.get("requestId");
+        List<ResultData> resultData = (List<ResultData>) bodyData.get("results");
+        this.receiverResultCode = (Integer) resultData.get(0).getResultCode();
+        this.receiverResultMessage = (String) resultData.get(0).getResultMessage();
+    }
+
+    @Data
+    private static class ResultData {
+        private Integer resultCode;
+        private String resultMessage;
     }
 
 }
