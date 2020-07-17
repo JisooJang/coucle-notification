@@ -87,7 +87,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaOperations<String, AlarmTalk> kafkaTemplate() {
+    public KafkaTemplate<String, AlarmTalk> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
