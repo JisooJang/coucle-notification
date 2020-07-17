@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface EmailClient {
     @PostMapping("/email/v1.6/appKeys/{appKey}/sender/mail")
     SendEmailResponse sendEmail(@PathVariable("appKey") String appKey,
-                                @RequestBody SendEmailRequest request);
+                              @RequestBody SendEmailRequest request);
 }

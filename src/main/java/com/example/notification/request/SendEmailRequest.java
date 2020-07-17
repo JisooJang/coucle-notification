@@ -17,6 +17,7 @@ public class SendEmailRequest {
     private String senderName;
     private String title;
     private String body;
+    private String requestDate;
     private List<ReceiverList> receiverList;
 
     public void addReceiverList(String receiveMailAddr, String receiveType) {

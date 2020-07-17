@@ -1,6 +1,8 @@
 package com.example.notification.config;
 
+import com.example.notification.request.SendEmailRequest;
 import com.example.notification.template.AlarmTalk;
+import com.example.notification.template.EmailSend;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -22,6 +24,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
 
+import javax.validation.constraints.Email;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +52,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, AlarmTalk> producerFactory() {
+    public ProducerFactory<String, AlarmTalk> alarmTalkProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -64,8 +67,21 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, AlarmTalk> consumerFactory() {
+    public ConsumerFactory<String, AlarmTalk> alarmTalkConsumerFactory() {
         JsonDeserializer<AlarmTalk> deserializer = new JsonDeserializer<>(AlarmTalk.class);
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+
+        return new DefaultKafkaConsumerFactory<>(
+                kafkaProperties.buildConsumerProperties(),
+                new StringDeserializer(),
+                deserializer);
+    }
+
+    @Bean
+    public ConsumerFactory<String, EmailSend> sendEmailConsumerFactory() {
+        JsonDeserializer<EmailSend> deserializer = new JsonDeserializer<>(EmailSend.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true);
@@ -81,14 +97,24 @@ public class KafkaConfig {
     alarmTalkKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, AlarmTalk> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(alarmTalkConsumerFactory());
+        factory.setErrorHandler(errorHandler());
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, EmailSend>
+    sendEmailKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, EmailSend> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(sendEmailConsumerFactory());
         factory.setErrorHandler(errorHandler());
         return factory;
     }
 
     @Bean
     public KafkaTemplate<String, AlarmTalk> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+        return new KafkaTemplate<>(alarmTalkProducerFactory());
     }
 
     @Bean
