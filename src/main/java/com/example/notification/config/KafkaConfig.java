@@ -1,6 +1,5 @@
 package com.example.notification.config;
 
-import com.example.notification.request.SendEmailRequest;
 import com.example.notification.template.AlarmTalk;
 import com.example.notification.template.EmailSend;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,7 @@ import java.util.Map;
 public class KafkaConfig {
 
     @Value(value = "${spring.kafka.bootstrap-servers}")
-    private String bootstrapAddress;
+    private String bootstrapAddress; // kafka address
 
     @Autowired
     private KafkaProperties kafkaProperties;
